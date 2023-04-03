@@ -74,8 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
-        dialog = new Dialog(MainActivity.this, android.R.style.Theme_Dialog);
-        open_dialog();
 
         et_1.addTextChangedListener(new TextWatcher() {
             @Override
@@ -109,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setSourceLanguage(TranslateLanguage.POLISH)
                         .setTargetLanguage(TranslateLanguage.ENGLISH)
                         .build();*/
-
         txt_lan_1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1,
@@ -123,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .build();
 
                 AtoBTranslator = Translation.getClient(options);
-
                 DownloadConditions conditions = new DownloadConditions.Builder().build();
                 AtoBTranslator.downloadModelIfNeeded(conditions)
                         .addOnSuccessListener (
@@ -143,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         txt.setText(e.getMessage());
                                     }
                                 });
+
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -268,14 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void open_dialog() {
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setContentView(R.layout.dialog_loading);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        dialog.setCancelable(false);
-        dialog.show();
-    }
+
 
     void swap() {
         int a = txt_lan_1.getSelectedItemPosition();
