@@ -11,11 +11,15 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,22 +40,33 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText et_1;
-    TextView txt, txt_lan_1, txt_lan_2;
-    Translator englishHindiTranslator, hindiEnglishTranslator;
+    TextView txt;
+    Spinner txt_lan_1, txt_lan_2;
+    Translator AtoBTranslator;
     ClipboardManager clipboard;
     ClipData clip;
     MDToast mdToast;
     Boolean flag = true;
     Dialog dialog;
-    TranslatorOptions options_2;
+    TranslatorOptions options;
+    String[] langs;
+    String[] langCodes;
+    int input_index, output_index;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        langs = new String[]{"ENGLISH","POLISH","SPANISH","FRENCH","GERMAN","ITALIAN","RUSSIAN","JAPANESE"};
+        langCodes = new String[]{"en","pl","es","fr","de","it","ru","ja"};
         setContentView(R.layout.activity_main);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, langs);
         et_1 = findViewById(R.id.et_1);
         txt = findViewById(R.id.txt);
         txt_lan_1 = findViewById(R.id.txt_lan_1);
         txt_lan_2 = findViewById(R.id.txt_lan_2);
+        txt_lan_1.setAdapter(adapter);
+        txt_lan_2.setAdapter(adapter);
+        input_index = txt_lan_1.getSelectedItemPosition();
+        output_index = txt_lan_2.getSelectedItemPosition();
         findViewById(R.id.swap).setOnClickListener(this);
         findViewById(R.id.mic).setOnClickListener(this);
         findViewById(R.id.cp_1).setOnClickListener(this);
@@ -67,9 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 // TODO Auto-generated method stub
-                if (flag)
-                    translate_hin(et_1.getText().toString());
-                else translate_eng(et_1.getText().toString());
+               translate_eng(et_1.getText().toString());
             }
 
             @Override
@@ -85,47 +98,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        // Create an English-Hindi translator:
-        TranslatorOptions options =
-                new TranslatorOptions.Builder()
+        // Create an English-Polish translator:
+          /*options = new TranslatorOptions.Builder()
                         .setSourceLanguage(TranslateLanguage.ENGLISH)
-                        .setTargetLanguage(TranslateLanguage.HINDI)
+                        .setTargetLanguage(TranslateLanguage.POLISH)
                         .build();
 
-        options_2 =
+           options =
                 new TranslatorOptions.Builder()
-                        .setSourceLanguage(TranslateLanguage.HINDI)
+                        .setSourceLanguage(TranslateLanguage.POLISH)
                         .setTargetLanguage(TranslateLanguage.ENGLISH)
+                        .build();*/
+
+        txt_lan_1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                       int arg2, long arg3) {
+                input_index = arg2;
+                String input_lang = langCodes[input_index];
+                String output_lang = langCodes[output_index];
+                options = new TranslatorOptions.Builder()
+                        .setSourceLanguage(input_lang)
+                        .setTargetLanguage(output_lang)
                         .build();
 
-        englishHindiTranslator =
-                Translation.getClient(options);
+                AtoBTranslator = Translation.getClient(options);
 
-        DownloadConditions conditions = new DownloadConditions.Builder()
-                .requireWifi()
-                .build();
-        englishHindiTranslator.downloadModelIfNeeded(conditions)
-                .addOnSuccessListener(
-                        new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void v) {
-                                // Model downloaded successfully. Okay to start translating.
-                                download_hin_eng();
-                            }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Model couldn’t be downloaded or other internal error.
-                                txt.setText(e.getMessage());
-                            }
-                        });
+                DownloadConditions conditions = new DownloadConditions.Builder().build();
+                AtoBTranslator.downloadModelIfNeeded(conditions)
+                        .addOnSuccessListener (
+                                new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void v) {
+                                        // Model downloaded successfully. Okay to start translating.
+                                        //download_pol_eng();
+
+                                    }
+                                })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Model couldn’t be downloaded or other internal error.
+                                        txt.setText(e.getMessage());
+                                    }
+                                });
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        txt_lan_2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                       int arg2, long arg3) {
+                output_index = arg2;
+                String input_lang = langCodes[input_index];
+                String output_lang = langCodes[output_index];
+                options = new TranslatorOptions.Builder()
+                        .setSourceLanguage(input_lang)
+                        .setTargetLanguage(output_lang)
+                        .build();
+
+                AtoBTranslator = Translation.getClient(options);
+
+                DownloadConditions conditions = new DownloadConditions.Builder().build();
+                AtoBTranslator.downloadModelIfNeeded(conditions)
+                        .addOnSuccessListener (
+                                new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void v) {
+                                        // Model downloaded successfully. Okay to start translating.
+                                        //download_pol_eng();
+
+                                    }
+                                })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Model couldn’t be downloaded or other internal error.
+                                        txt.setText(e.getMessage());
+                                    }
+                                });
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
     }
 
-    void download_hin_eng() {
-        hindiEnglishTranslator = Translation.getClient(options_2);
-        hindiEnglishTranslator.downloadModelIfNeeded()
+    /*void download_pol_eng() {
+        polishEnglishTranslator = Translation.getClient(options_2);
+        polishEnglishTranslator.downloadModelIfNeeded()
                 .addOnSuccessListener(
                         new OnSuccessListener<Void>() {
                             @Override
@@ -147,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 txt.setText(e.getMessage());
                             }
                         });
-    }
+    }*/
 
     @Override
     public void onClick(View v) {
@@ -187,9 +257,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     void voice() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        if (flag)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH);
-        else intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi");
+        /*if (flag)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en");
+        else intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"pl");*/
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCodes[input_index]);
         try {
             startActivityForResult(intent, 200);
         } catch (ActivityNotFoundException a) {
@@ -207,19 +278,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void swap() {
-        String a = txt_lan_1.getText().toString();
-        String b = txt_lan_2.getText().toString();
-        a = a + b;
-        b = a.substring(0, a.length() - b.length());
-        a = a.substring(b.length());
-        txt_lan_1.setText(a);
-        txt_lan_2.setText(b);
+        int a = txt_lan_1.getSelectedItemPosition();
+        int b = txt_lan_2.getSelectedItemPosition();
+        txt_lan_1.setSelection(b);
+        txt_lan_2.setSelection(a);
         if (flag)
             flag = false;
         else flag = true;
         et_1.setText(null);
         txt.setText(null);
-        toast("Language Changed",1);
+        //toast("Language Changed",1);
     }
 
     void copy(String text) {
@@ -247,16 +315,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 assert result != null;
                 et_1.setText(result.get(0));
 
-                if (flag)
-                    translate_hin(et_1.getText().toString().trim());
-                else translate_eng(et_1.getText().toString().trim());
+               translate_eng(et_1.getText().toString().trim());
 
             }
         }
     }
 
-    void translate_hin(String text) {
-        englishHindiTranslator.translate(text)
+    /*void translate_pol(String text) {
+        englishPolishTranslator.translate(text)
                 .addOnSuccessListener(
                         new OnSuccessListener<String>() {
                             @Override
@@ -274,10 +340,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 txt.setText(e.getMessage());
                             }
                         });
-    }
+    }*/
 
     void translate_eng(String text) {
-        hindiEnglishTranslator.translate(text)
+        AtoBTranslator.translate(text)
                 .addOnSuccessListener(
                         new OnSuccessListener<String>() {
                             @Override

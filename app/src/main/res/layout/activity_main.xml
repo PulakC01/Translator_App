@@ -54,15 +54,14 @@
                 app:cardUseCompatPadding="true"
                 app:cardCornerRadius="5dp">
 
-            <TextView
+            <Spinner
                 android:id="@+id/txt_lan_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="35dp"
-                android:paddingVertical="5dp"
-                android:text="@string/english"
+
+                android:spinnerMode="dropdown"
                 android:textColor="#000"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
             </androidx.cardview.widget.CardView>
 
@@ -155,15 +154,14 @@
                 app:cardUseCompatPadding="true"
                 app:cardCornerRadius="5dp">
 
-                <TextView
+                <Spinner
                     android:id="@+id/txt_lan_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="35dp"
-                    android:paddingVertical="5dp"
-                    android:text="@string/hindi"
+
+                    android:spinnerMode="dropdown"
                     android:textColor="#000"
-                    android:textSize="16sp" />
+                    android:textSize="12sp" />
             </androidx.cardview.widget.CardView>
 
 
